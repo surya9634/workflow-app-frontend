@@ -2,14 +2,14 @@
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-// Use VITE_API_URL from environment variables with fallback to empty string
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Hardcoded production URL
+const API_BASE_URL = 'https://workflow-app.onrender.com';
 
 // Debug logging
-console.log('🔄 API Configuration:');
+console.log('🚀 API Configuration:');
 console.log('- Base URL:', API_BASE_URL);
 console.log('- Mode:', import.meta.env.MODE);
-console.log('- Env:', import.meta.env);
+console.log('- Environment:', process.env.NODE_ENV);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -30,14 +30,11 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Log request details in development
-    if (import.meta.env.DEV) {
-      console.log(`📤 [${config.method?.toUpperCase()}] ${config.url}`, {
-        data: config.data,
-        params: config.params,
-        headers: config.headers,
-      });
-    }
+    // Log request details
+    console.log(`📤 [${config.method?.toUpperCase()}] ${config.url}`, {
+      data: config.data,
+      params: config.params,
+    });
     
     return config;
   },
@@ -47,132 +44,63 @@ api.interceptors.request.use(
   }
 );
 
-// Helper function to safely parse JSON
-const safeJsonParse = (str) => {
-  try {
-    return str ? JSON.parse(str) : str;
-  } catch (e) {
-    console.warn('Failed to parse JSON:', str);
-    return str;
-  }
-};
-
-// Response interceptor for handling errors globally
+// Response interceptor for handling errors
 api.interceptors.response.use(
   (response) => {
-    // Ensure response data is properly parsed
-    if (typeof response.data === 'string') {
-      try {
-        response.data = safeJsonParse(response.data);
-      } catch (e) {
-        console.warn('Failed to parse response data:', response.data);
-      }
-    }
-    
-    // Log successful responses in development
-    if (import.meta.env.DEV) {
-      console.log(`📥 [${response.status}] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        data: response.data,
-        headers: response.headers,
-      });
-    }
-    
+    console.log(`✅ [${response.status}] ${response.config.url}`, response.data);
     return response;
   },
-  async (error) => {
-    // Log the full error in development
-    if (import.meta.env.DEV) {
-      console.error('❌ API Error:', {
-        message: error.message,
-        config: {
-          ...error.config,
-          // Don't log potentially sensitive data
-          data: error.config?.data ? '[REDACTED]' : undefined,
-          headers: error.config?.headers ? '[REDACTED]' : undefined,
-        },
-        response: error.response ? {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          data: error.response.data,
-          headers: error.response.headers,
-        } : 'No response',
-        stack: error.stack,
-      });
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      const errorMessage = 'Network error. Please check your connection.';
-      console.error('Network Error:', error.message);
-      toast.error(errorMessage);
-      return Promise.reject({
-        message: errorMessage,
-        isNetworkError: true,
-      });
-    }
-
-    // Handle specific status codes
-    const { status, data } = error.response;
+  (error) => {
+    const { response } = error;
+    const errorMessage = response?.data?.message || error.message;
     
-    // Handle 401 Unauthorized
-    if (status === 401) {
-      // Clear auth data and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      toast.error('Session expired. Please log in again.');
-    }
-    
-    // Handle 403 Forbidden
-    if (status === 403) {
-      toast.error('You do not have permission to perform this action.');
-    }
-    
-    // Handle 422 Unprocessable Entity (validation errors)
-    if (status === 422 && data.errors) {
-      const errorMessages = Object.values(data.errors).flat().join('\n');
-      toast.error(errorMessages || 'Validation failed. Please check your input.');
-    }
-    
-    // Handle 500 Internal Server Error
-    if (status >= 500) {
-      toast.error('Server error. Please try again later.');
-    }
-    
-    // Handle 404 Not Found
-    if (status === 404) {
-      toast.error('The requested resource was not found.');
-    }
-    
-    // Handle 500 Internal Server Error
-    if (status >= 500) {
-      toast.error('Server error. Please try again later.');
-    }
-    
-    // Return a consistent error object
-    return Promise.reject({
-      status,
-      message: data?.message || error.message || 'An error occurred',
-      errors: data?.errors || {},
-      data: data,
+    console.error('❌ Response error:', {
+      url: error.config?.url,
+      status: response?.status,
+      message: errorMessage,
     });
+
+    // Handle specific error statuses
+    if (response) {
+      switch (response.status) {
+        case 401:
+          // Handle unauthorized (e.g., redirect to login)
+          if (window.location.pathname !== '/login') {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }
+          break;
+        case 404:
+          toast.error('Resource not found');
+          break;
+        case 500:
+          toast.error('Server error. Please try again later.');
+          break;
+        default:
+          toast.error(errorMessage || 'An error occurred');
+      }
+    } else {
+      toast.error('Network error. Please check your connection.');
+    }
+
+    return Promise.reject(error);
   }
 );
 
-// Auth APIs
-export const authAPI = {
-  signup: (data) => api.post('/auth/signup', data),
-  signin: (data) => api.post('/auth/signin', data),
-  getCurrentUser: () => api.get('/auth/me'),
-  signout: () => api.post('/auth/signout'),
-  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token, newPassword) => api.post(`/auth/reset-password/${token}`, { newPassword }),
+// Helper function to handle API errors
+export const handleApiError = (error, customMessage = 'An error occurred') => {
+  console.error('API Error:', error);
+  const errorMessage = error.response?.data?.message || customMessage;
+  toast.error(errorMessage);
+  throw new Error(errorMessage);
 };
 
-// Onboarding APIs
-export const onboardingAPI = {
-  submit: (data) => api.post('/onboarding', data),
-  get: (userId) => api.get(`/onboarding/${userId}`),
+// API endpoints
+export const authAPI = {
+  login: (credentials) => api.post('/auth/signin', credentials),
+  register: (userData) => api.post('/auth/signup', userData),
+  logout: () => api.post('/auth/logout'),
+  getCurrentUser: () => api.get('/auth/me'),
 };
 
 // AI APIs
