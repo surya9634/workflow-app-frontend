@@ -1,0 +1,136 @@
+[
+  {
+    "id": "1754539822088",
+    "userId": "1754539019400",
+    "businessName": "WORK-FLOW",
+    "userName": "suraj sharma",
+    "businessDescription": "WE ARE A GOOD LVL OF BUSINESS OWNER",
+    "idealCustomer": "GYM OWNERS",
+    "leadSources": [
+      "India"
+    ],
+    "leadSourcesOther": "",
+    "dealSize": "Under ₹5,000",
+    "communicationPlatforms": [
+      "WhatsApp",
+      "Instagram",
+      "Facebook Messenger"
+    ],
+    "communicationOther": "",
+    "leadHandling": "Let your AI agent handle it",
+    "salesGoal": "10000",
+    "customerQuestions": [
+      "ggg",
+      "ggg",
+      "gggg"
+    ],
+    "websiteLinks": "ggg",
+    "urgency": "ASAP",
+    "completedAt": "2025-08-07T04:10:22.088Z"
+  },
+  {
+    "id": "1754556794519",
+    "userId": "1754556610361",
+    "businessName": "Test Business",
+    "userName": "Test User",
+    "businessDescription": "Test business description",
+    "idealCustomer": "Test customer",
+    "leadSources": [
+      "Website"
+    ],
+    "leadSourcesOther": "",
+    "dealSize": "$100",
+    "communicationPlatforms": [
+      "Email"
+    ],
+    "communicationOther": "",
+    "leadHandling": "Automated",
+    "salesGoal": "$1000",
+    "customerQuestions": [],
+    "websiteLinks": "",
+    "urgency": "High",
+    "completedAt": "2025-08-07T08:53:14.519Z"
+  },
+  {
+    "id": "1754559298912",
+    "userId": "1754559241193",
+    "businessName": "Test Business 3",
+    "userName": "Test User 3",
+    "businessDescription": "Test business description 3",
+    "idealCustomer": "Test customer 3",
+    "leadSources": [
+      "Website"
+    ],
+    "leadSourcesOther": "",
+    "dealSize": "$300",
+    "communicationPlatforms": [
+      "Email"
+    ],
+    "communicationOther": "",
+    "leadHandling": "Automated",
+    "salesGoal": "$3000",
+    "customerQuestions": [],
+    "websiteLinks": "",
+    "urgency": "High",
+    "completedAt": "2025-08-07T09:34:58.912Z"
+  },
+  {
+    "id": "1754561522987",
+    "userId": "1754561470629",
+    "businessName": "Work-Flow",
+    "userName": "suraj sharma",
+    "businessDescription": "we are building saas plateform ",
+    "idealCustomer": "e comm business",
+    "leadSources": [
+      "India",
+      "Local"
+    ],
+    "leadSourcesOther": "",
+    "dealSize": "Under ₹5,000",
+    "communicationPlatforms": [
+      "WhatsApp",
+      "Instagram",
+      "Facebook Messenger"
+    ],
+    "communicationOther": "",
+    "leadHandling": "Let your AI agent handle it",
+    "salesGoal": "5900",
+    "customerQuestions": [
+      "",
+      "",
+      ""
+    ],
+    "websiteLinks": "",
+    "urgency": "ASAP",
+    "completedAt": "2025-08-07T10:12:02.987Z"
+  },
+  {
+    "id": "1754796550453",
+    "userId": "1754796529165",
+    "businessName": "gg",
+    "userName": "gg",
+    "businessDescription": "gg",
+    "idealCustomer": "gg",
+    "leadSources": [
+      "Local",
+      "India"
+    ],
+    "leadSourcesOther": "",
+    "dealSize": "Under ₹5,000",
+    "communicationPlatforms": [
+      "WhatsApp",
+      "Instagram"
+    ],
+    "communicationOther": "",
+    "leadHandling": "Send to my sales team",
+    "salesGoal": "76687",
+    "customerQuestions": [
+      "",
+      "",
+      ""
+    ],
+    "websiteLinks": "",
+    "urgency": "ASAP",
+    "completedAt": "2025-08-10T03:29:10.453Z"
+  }
+]

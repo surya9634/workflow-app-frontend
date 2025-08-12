@@ -1,0 +1,13 @@
+[
+  {
+    "id": "1754536804822",
+    "email": "test@example.com",
+    "password": "$2b$10$AdsZyNhXlqEcqU/LAa296.JHn4mjpMs2pgDTVN2aTyaA5anmf4Nwb2",
+    "role": "user",
+    "name": "Test User",
+    "onboardingCompleted": true,
+    "createdAt": "2025-08-10T03:28:49.165Z",
+    "lastLogin": "2025-08-12T05:28:49.165Z",
+    "isActive": true
+  }
+]
