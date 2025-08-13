@@ -100,7 +100,7 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/signin', credentials),
   register: (userData) => api.post('/auth/signup', userData),
   logout: () => api.post('/auth/logout'),
-  getCurrentUser: () => api.get('/auth/me'),
+  getCurrentUser: () => api.get('/auth/me')
 };
 
 // AI APIs
