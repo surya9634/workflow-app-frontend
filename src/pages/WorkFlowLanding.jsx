@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Navbar from "../components/LandingPage/Navbar";
-import Auth from "../components/LandingPage/AuthModal";
+import AuthModal from "../components/LandingPage/AuthModal";
 import HeroSection from "../components/LandingPage/Hero";
 import SocialProof from "../components/LandingPage/SocialProof";
 import Features from "../components/LandingPage/Features";
@@ -119,19 +119,21 @@ const WorkFlowLanding = () => {
       />
 
       {/* Modal for Sign In / Log In */}
-      <Auth
-        showModal={showModal}
-        setShowModal={setShowModal}
+      <AuthModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onAuthSuccess={(userData) => {
+          setShowModal(false);
+          // Handle successful authentication
+          if (userData.role === 'admin') {
+            navigate('/admin');
+          } else if (localStorage.getItem('isNewSignup') === 'true') {
+            navigate('/onboarding');
+          } else {
+            navigate('/dashboard');
+          }
+        }}
         isLogin={isLogin}
-        setIsLogin={setIsLogin}
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        errors={errors}
-        setErrors={setErrors}
-        handleSubmit={handleSubmit}
-        isLoading={isLoading}
       />
       <RevealOnScroll>
         <HeroSection onOpenModal={() => setShowModal(true)} />

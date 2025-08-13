@@ -3,13 +3,25 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 // Get API URL from environment variables or use a default
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://workflow-app.onrender.com';
+const ENV_API_URL = import.meta.env.VITE_API_URL || 'https://workflow-app.onrender.com';
+let API_BASE_URL = ENV_API_URL.replace(/\/+$/, '');
+
+// Ensure the base URL doesn't have /api at the end to avoid double /api
+API_BASE_URL = API_BASE_URL.endsWith('/api') 
+  ? API_BASE_URL.substring(0, API_BASE_URL.length - 4) 
+  : API_BASE_URL;
 
 // Debug logging
-console.log('🚀 API Configuration:');
-console.log('- Base URL:', API_BASE_URL);
-console.log('- Mode:', import.meta.env.MODE);
-console.log('- Env:', import.meta.env);
+console.group('🚀 API Configuration');
+console.log('Environment API URL:', ENV_API_URL);
+console.log('Final Base URL:', API_BASE_URL);
+console.log('Mode:', import.meta.env.MODE);
+console.log('Environment Variables:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE
+});
+console.groupEnd();
 
 // Create axios instance with default config
 const api = axios.create({
@@ -21,6 +33,56 @@ const api = axios.create({
     'Accept': 'application/json',
   },
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(request => {
+  console.log('Starting Request', {
+    url: request.url,
+    method: request.method,
+    baseURL: request.baseURL,
+    fullURL: request.baseURL + request.url,
+    headers: request.headers,
+    data: request.data
+  });
+  return request;
+});
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  response => {
+    console.log('Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      data: response.data,
+      headers: response.headers,
+      config: {
+        url: response.config.url,
+        baseURL: response.config.baseURL,
+        method: response.config.method
+      }
+    });
+    return response;
+  },
+  error => {
+    console.error('API Error:', {
+      message: error.message,
+      response: error.response ? {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+        headers: error.response.headers,
+      } : 'No response',
+      request: error.request ? 'Request made but no response received' : 'No request was made',
+      config: {
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        method: error.config?.method,
+        data: error.config?.data
+      }
+    });
+    return Promise.reject(error);
+  }
+);
 
 // Request interceptor for logging and auth
 api.interceptors.request.use(
@@ -97,48 +159,48 @@ export const handleApiError = (error, customMessage = 'An error occurred') => {
 
 // API endpoints
 export const authAPI = {
-  login: (credentials) => api.post('/auth/signin', credentials),
-  register: (userData) => api.post('/auth/signup', userData),
-  logout: () => api.post('/auth/logout'),
-  getCurrentUser: () => api.get('/auth/me')
+  login: (credentials) => api.post('/api/auth/signin', credentials),
+  register: (userData) => api.post('/api/auth/signup', userData),
+  logout: () => api.post('/api/auth/signout'),
+  getCurrentUser: () => api.get('/api/auth/me')
 };
 
 // AI APIs
 export const aiAPI = {
-  chat: (data) => api.post('/ai/chat', data),
-  generateContent: (data) => api.post('/ai/generate-content', data),
+  chat: (data) => api.post('/api/ai/chat', data),
+  generateContent: (data) => api.post('/api/ai/generate-content', data),
 };
 
 // Social Media APIs
 export const socialMediaAPI = {
-  getFacebookAuthUrl: () => api.get('/auth/facebook'),
-  getAccounts: () => api.get('/social-media/accounts'),
-  disconnectAccount: (accountId) => api.delete(`/social-media/accounts/${accountId}`),
-  sendFacebookMessage: (data) => api.post('/social-media/facebook/message', data),
-  sendInstagramMessage: (data) => api.post('/social-media/instagram/message', data),
+  getFacebookAuthUrl: () => api.get('/api/auth/facebook'),
+  getAccounts: () => api.get('/api/social-media/accounts'),
+  disconnectAccount: (accountId) => api.delete(`/api/social-media/accounts/${accountId}`),
+  sendFacebookMessage: (data) => api.post('/api/social-media/facebook/message', data),
+  sendInstagramMessage: (data) => api.post('/api/social-media/instagram/message', data),
 };
 
 // Admin APIs
 export const adminAPI = {
-  getUsers: (params) => api.get('/admin/users', { params }),
-  getStats: () => api.get('/admin/stats'),
-  getOnboardingData: (params) => api.get('/admin/onboarding', { params }),
-  updateUser: (userId, data) => api.put(`/admin/users/${userId}`, data),
-  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
-  createUser: (data) => api.post('/admin/users', data),
-  resetPassword: (userId, data) => api.post(`/admin/users/${userId}/reset-password`, data),
+  getUsers: (params) => api.get('/api/admin/users', { params }),
+  getStats: () => api.get('/api/admin/stats'),
+  getOnboardingData: (params) => api.get('/api/admin/onboarding', { params }),
+  updateUser: (userId, data) => api.put(`/api/admin/users/${userId}`, data),
+  deleteUser: (userId) => api.delete(`/api/admin/users/${userId}`),
+  createUser: (data) => api.post('/api/admin/users', data),
+  resetPassword: (userId, data) => api.post(`/api/admin/users/${userId}/reset-password`, data),
 };
 
 // Analytics APIs
 export const analyticsAPI = {
-  getDashboardData: () => api.get('/analytics/dashboard'),
+  getDashboardData: () => api.get('/api/analytics/dashboard'),
 };
 
 // Conversation APIs
 export const conversationAPI = {
-  getConversations: () => api.get('/conversations'),
-  getMessages: (conversationId) => api.get(`/conversations/${conversationId}/messages`),
-  sendMessage: (conversationId, message) => api.post(`/conversations/${conversationId}/messages`, { message }),
+  getConversations: () => api.get('/api/conversations'),
+  getMessages: (conversationId) => api.get(`/api/conversations/${conversationId}/messages`),
+  sendMessage: (conversationId, message) => api.post(`/api/conversations/${conversationId}/messages`, { message }),
 };
 
 export default api;
