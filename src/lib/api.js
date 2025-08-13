@@ -2,14 +2,14 @@
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-// Hardcoded production URL
-const API_BASE_URL = 'https://workflow-app.onrender.com';
+// Get API URL from environment variables or use a default
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://workflow-app.onrender.com';
 
 // Debug logging
 console.log('🚀 API Configuration:');
 console.log('- Base URL:', API_BASE_URL);
 console.log('- Mode:', import.meta.env.MODE);
-console.log('- Environment:', process.env.NODE_ENV);
+console.log('- Env:', import.meta.env);
 
 // Create axios instance with default config
 const api = axios.create({
